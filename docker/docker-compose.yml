@@ -9,6 +9,22 @@ services:
     networks:
       - localnet
 
+  couchbase-node1:
+    image: couchbase:community-7.6.2
+    container_name: couchbase-node1
+    ports:
+      - "18091:8091"
+    networks:
+      - localnet
+
+  couchbase-node2:
+    image: couchbase:community-7.6.2
+    container_name: couchbase-node2
+    ports:
+      - "28091:8091"
+    networks:
+      - localnet
+
 networks:
   localnet:
     driver: bridge
