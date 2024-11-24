@@ -21,7 +21,7 @@ export type RepositoryOptions = {
 
 @Injectable()
 export class NormRepository {
-  constructor(@InjectModel('norm') readonly model: ModelTypes<NormDto, NormSerializer>) {}
+  constructor(@InjectModel('norm') readonly model: ModelTypes<NormDto, NormSerializer>) { }
 
   count(filter: LogicalWhereExpr<Norm>, options?: RepositoryOptions): Promise<number> {
     return this.model.count(filter, options);
@@ -31,9 +31,8 @@ export class NormRepository {
     return this.model.create<NormSerializer>(doc, options);
   }
 
-  async createBulk(docs: NormDto[], options?: RepositoryOptions): Promise<IDocument<NormSerializer>[]> {
-    const result = await this.model.createMany(docs, options);
-    return result.message.data;
+  createBulk(docs: NormDto[], options?: RepositoryOptions): Promise<IDocument<NormSerializer>[]> {
+    return Promise.all(docs.map(doc => this.model.create<NormSerializer>(doc, options)))
   }
 
   find(filter: LogicalWhereExpr<Norm>, options?: RepositoryOptions): Promise<IDocument<NormSerializer>[]> {
