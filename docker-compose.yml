@@ -1,0 +1,173 @@
+x-common: &common
+  env_file:
+    - .env
+  networks:
+    - localnet
+
+services:
+  gateway:
+    build:
+      args:
+        SERVICE_NAME: gateway
+      context: .
+    ports:
+      - 3010:3010 # Rest
+    environment:
+      NODE_ENV: prod
+      SENTRY_DSN:
+    <<: *common
+
+  #######################
+  # AUTH SERVICE
+  #######################
+  auth:
+    container_name: auth
+    build:
+      args:
+        SERVICE_NAME: auth
+      context: .
+    ports:
+      - 3020:3020 # Rest
+      - 5020:5020 # gRPC
+    environment:
+      NODE_ENV: prod
+      SENTRY_DSN:
+    <<: *common
+
+  #######################
+  # DOMAIN SERVICES
+  #######################
+  domain:
+    container_name: domain
+    build:
+      args:
+        SERVICE_NAME: domain
+      context: .
+    ports:
+      - 3040:3040 # Rest
+      - 5040:5040 # gRPC
+    environment:
+      NODE_ENV: prod
+      SENTRY_DSN:
+    <<: *common
+
+  #######################
+  # CONTEXT SERVICE
+  #######################
+  context:
+    container_name: context
+    build:
+      args:
+        SERVICE_NAME: context
+      context: .
+    ports:
+      - 3030:3030 # Rest
+      - 5030:5030 # gRPC
+    environment:
+      NODE_ENV: prod
+      SENTRY_DSN:
+    <<: *common
+
+  #######################
+  # IDENTITY SERVICES
+  #######################
+  identity:
+    container_name: identity
+    build:
+      args:
+        SERVICE_NAME: identity
+      context: .
+    ports:
+      - 3050:3050 # Rest
+      - 5050:5050 # gRPC
+    environment:
+      NODE_ENV: prod
+      SENTRY_DSN:
+    <<: *common
+
+  #######################
+  # SPECIAL SERVICES
+  #######################
+  special:
+    container_name: special
+    build:
+      args:
+        SERVICE_NAME: special
+      context: .
+    ports:
+      - 3060:3060 # Rest
+    environment:
+      NODE_ENV: prod
+      SENTRY_DSN:
+    <<: *common
+
+  #######################
+  # TOUCH SERVICES
+  #######################
+  touch:
+    container_name: touch
+    build:
+      args:
+        SERVICE_NAME: touch
+      context: .
+    ports:
+      - 3070:3070 # Rest
+    environment:
+      NODE_ENV: prod
+      SENTRY_DSN:
+    <<: *common
+
+  #######################
+  # FINANCIAL SERVICES
+  #######################
+  financial:
+    container_name: financial
+    build:
+      args:
+        SERVICE_NAME: financial
+      context: .
+    ports:
+      - 3080:3080 # Rest
+    environment:
+      NODE_ENV: prod
+      SENTRY_DSN:
+    <<: *common
+
+  #######################
+  # DISPATCHER WORKER
+  #######################
+  dispatcher:
+    profiles: [ 'workers' ]
+    container_name: dispatcher
+    build:
+      args:
+        SERVICE_NAME: dispatcher
+      context: .
+    ports:
+      - 4010:4010 # Rest
+    environment:
+      NODE_ENV: prod
+      SENTRY_DSN:
+    <<: *common
+
+  #######################
+  # PRESERVER WORKER
+  #######################
+  preserver:
+    profiles: [ 'workers' ]
+    container_name: preserver
+    build:
+      args:
+        SERVICE_NAME: preserver
+      context: .
+    ports:
+      - 4020:4020 # Rest
+      - 6020:6020 # gRPC
+    environment:
+      NODE_ENV: prod
+      SENTRY_DSN:
+    <<: *common
+
+networks:
+  localnet:
+    driver: bridge

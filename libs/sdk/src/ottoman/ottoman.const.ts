@@ -1,0 +1,1 @@
+export const OTTOMAN_CONNECTION = Symbol('OTTOMAN_CONNECTION');

@@ -1,0 +1,14 @@
+services:
+  couchbase:
+    image: couchbase:community-7.6.2
+    container_name: couchbase
+    ports:
+      - "8091-8097:8091-8097"
+      - "9123:9123"
+      - "11210:11210"
+    networks:
+      - localnet
+
+networks:
+  localnet:
+    driver: bridge
