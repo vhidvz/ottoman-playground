@@ -1,12 +1,12 @@
-import { InjectModel } from '@app/sdk/ottoman';
 import { Injectable } from '@nestjs/common';
-import { ModelTypes } from 'ottoman';
+
+import { NormRepository } from './norm.repository';
 
 @Injectable()
 export class NormService {
-  constructor(@InjectModel("norm") protected readonly model: ModelTypes) { }
+  constructor(private readonly repository: NormRepository) {}
 
   async getHello() {
-    return this.model.count()
+    return this.repository.count({});
   }
 }

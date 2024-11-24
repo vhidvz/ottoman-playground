@@ -4,7 +4,7 @@ import { NormService } from './norm.service';
 
 @Controller()
 export class NormController {
-  constructor(private readonly normService: NormService) { }
+  constructor(private readonly normService: NormService) {}
 
   @Get()
   getHello() {

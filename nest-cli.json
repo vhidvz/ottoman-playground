@@ -3,8 +3,19 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "apps/norm/src",
   "compilerOptions": {
-    "deleteOutDir": true,
     "webpack": true,
+    "watchAssets": true,
+    "deleteOutDir": true,
+    "builder": "webpack",
+    "plugins": [
+      {
+        "name": "@nestjs/swagger",
+        "options": {
+          "introspectComments": true,
+          "dtoFileNameSuffix": [".dto.ts", ".serializer.ts"]
+        }
+      }
+    ],
     "tsConfigPath": "apps/norm/tsconfig.app.json"
   },
   "monorepo": true,

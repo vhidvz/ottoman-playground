@@ -15,7 +15,13 @@ export class OttomanModule {
   static forRoot(scope: string, options: ConnectOptions): DynamicModule {
     this.scope = scope;
     this.ottoman = getDefaultInstance() || new Ottoman({ scopeName: scope });
+
+    console.log(
+      '\x1b[33m%s\x1b[0m',
+      `[ottoman] Please, make sure the '${options.bucketName}' bucket with the '${scope}' scope exists.`,
+    );
     this.ottoman.connect(options).catch(console.error);
+
     return {
       global: true,
       module: OttomanModule,
@@ -32,6 +38,11 @@ export class OttomanModule {
   static forFeature(models: ModelDefinition[]): DynamicModule {
     const providers: Provider[] = [];
     for (const model of models) {
+      console.log(
+        '\x1b[33m%s\x1b[0m',
+        `[ottoman] Please, make sure the [scope: '${this.scope}'].[collection: '${model.collection || model.name}'] exists.`,
+      );
+
       const options = { scopeName: this.scope, collectionName: model.collection };
       const useValue = this.ottoman.model(model.name, model.schema, options);
       providers.push({ provide: this.token(model.name), useValue });

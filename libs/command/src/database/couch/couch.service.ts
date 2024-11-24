@@ -51,7 +51,6 @@ export class CouchService extends CommandRunner {
     const baseURL = `${base}:${port}`;
     console.log('\x1b[33m%s\x1b[0m', `Couchbase configuration panel is located at the ${baseURL} link location.`);
 
-
     console.log('Couchbase initialized ;)');
   }
 }
