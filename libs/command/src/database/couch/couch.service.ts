@@ -1,10 +1,9 @@
-import { Command, CommandRunner, Option } from 'nest-commander';
+import { Command, CommandRunner } from 'nest-commander';
 import { Inject, Injectable } from '@nestjs/common';
 import { COUCH_CONFIG } from '@app/common/envs';
 import { HttpService } from '@nestjs/axios';
 
 import { COUCH_OPTIONS } from './couch.const';
-import { stringify } from 'querystring';
 
 interface CouchCommandOptions {
   bucket?: string[] | true;
@@ -29,55 +28,30 @@ export class CouchService extends CommandRunner {
     if (passedParams.includes('init')) await this.init(options);
   }
 
-  async init(options?: CouchCommandOptions): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async init(_options?: CouchCommandOptions): Promise<void> {
     console.log('Initializing couchbase...');
 
-    const port = +process.env.COUCH_PORT || 8091;
     const { bucketName, username, password } = this.config;
     const ramQuotaMB = +process.env.COUCH_RAM_QUOTA_MB || 256;
 
-    // Set Admin Credentials
-    try {
-      await this.httpService.axiosRef.post('/settings/web', stringify({ username, password, port }));
-      console.log('\x1b[32m%s\x1b[0m', `Admin credential settled.`);
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-    } catch {
-      console.log('\x1b[33m%s\x1b[0m', `Admin credential already settled.`);
-    }
+    console.log(
+      '\x1b[33m%s\x1b[0m',
+      `Manually configure couchbase credentials with the username: ${username} and password: ${password}`,
+    );
 
-    // Create a Bucket
-    if (this.cond(bucketName, options)) {
-      const { data: buckets } = await this.httpService.axiosRef.get('/pools/default/buckets', {
-        auth: { username, password },
-      });
+    console.log(
+      '\x1b[33m%s\x1b[0m',
+      `Configure couchbase buckets with a new bucket with the name of ${bucketName} and ramQuotaMB: ${ramQuotaMB}`,
+    );
 
-      if (!buckets?.some((b: { name: string }) => b.name === bucketName)) {
-        await this.httpService.axiosRef.post('/pools/default/buckets', stringify({ name: bucketName, ramQuotaMB }), {
-          auth: { username, password },
-        });
+    const port = +process.env.COUCH_PORT || 8091;
+    const base = +process.env.COUCH_BASE || 'http://localhost';
 
-        console.log('\x1b[32m%s\x1b[0m', `Couchbase bucket ${bucketName} created.`);
-        console.log('\x1b[33m%s\x1b[0m', `Please make sure the bucket configured correctly.`);
-      } else console.log('\x1b[33m%s\x1b[0m', `Couchbase bucket ${bucketName} already exists.`);
-    }
+    const baseURL = `${base}:${port}`;
+    console.log('\x1b[33m%s\x1b[0m', `Couchbase configuration panel is located at the ${baseURL} link location.`);
+
 
     console.log('Couchbase initialized ;)');
-  }
-
-  @Option({
-    required: false,
-    defaultValue: true,
-    flags: '-b, --bucket [string]',
-    description: 'bucket names',
-  })
-  parseString(val: string): CouchCommandOptions['bucket'] {
-    return val.split(',');
-  }
-
-  private cond(bucket: string, options?: CouchCommandOptions): boolean {
-    return (
-      (typeof options?.bucket === 'boolean' && options.bucket) ||
-      (typeof options?.bucket === 'object' && options.bucket.includes(bucket))
-    );
   }
 }
