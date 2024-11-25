@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Patch, Post, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Res } from '@nestjs/common';
 import { getMessageEvent } from '@app/common/utils';
 import { LogicalWhereExpr } from 'ottoman';
 import { Response } from 'express';
@@ -46,22 +46,13 @@ export class NormController {
   }
 
   @Get(':id')
-  findOne(@Body('id') id: string, @Body('options') options?: RepositoryOptions) {
+  findOne(@Param('id') id: string, @Body('options') options?: RepositoryOptions) {
     return this.service.findOne({ id }, options);
   }
 
   @Delete(':id')
-  deleteOne(@Body('id') id: string) {
+  deleteOne(@Param('id') id: string) {
     return this.service.deleteOne({ id });
-  }
-
-  @Patch(':id')
-  updateOne(
-    @Body('filter') filter: LogicalWhereExpr<Norm>,
-    @Body('doc') doc: Partial<NormDto>,
-    @Body('options') options?: RepositoryOptions,
-  ) {
-    return this.service.updateOne(filter, doc, options);
   }
 
   @Patch('bulk')
@@ -71,5 +62,10 @@ export class NormController {
     @Body('options') options?: RepositoryOptions,
   ) {
     return this.service.updateBulk(filter, doc, options);
+  }
+
+  @Patch(':id')
+  updateOne(@Param('id') id: string, @Body('doc') doc: Partial<NormDto>, @Body('options') options?: RepositoryOptions) {
+    return this.service.updateOne({ id }, doc, options);
   }
 }

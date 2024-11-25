@@ -21,7 +21,7 @@ export type RepositoryOptions = {
 
 @Injectable()
 export class NormRepository {
-  constructor(@InjectModel('norm') readonly model: ModelTypes<NormDto, NormSerializer>) { }
+  constructor(@InjectModel('norm') readonly model: ModelTypes<NormDto, NormSerializer>) {}
 
   count(filter: LogicalWhereExpr<Norm>, options?: RepositoryOptions): Promise<number> {
     return this.model.count(filter, options);
@@ -32,15 +32,27 @@ export class NormRepository {
   }
 
   createBulk(docs: NormDto[], options?: RepositoryOptions): Promise<IDocument<NormSerializer>[]> {
-    return Promise.all(docs.map(doc => this.model.create<NormSerializer>(doc, options)))
+    return Promise.all(docs.map((doc) => this.model.create<NormSerializer>(doc, options)));
   }
 
-  find(filter: LogicalWhereExpr<Norm>, options?: RepositoryOptions): Promise<IDocument<NormSerializer>[]> {
-    return this.model.find(filter, options);
+  async find(filter: LogicalWhereExpr<Norm>, options?: RepositoryOptions): Promise<IDocument<NormSerializer>[]> {
+    const result = await this.model.find(filter, options);
+    return result.rows;
   }
 
   cursor(filter: LogicalWhereExpr<Norm>, options?: RepositoryOptions): Observable<IDocument<NormSerializer>> {
-    return from(this.model.find(filter, options));
+    return new Observable<IDocument<NormSerializer>>((subscriber) => {
+      let skip = 0;
+      while (skip < 4) {
+        const temp = skip;
+        from(this.model.findOne(filter, { ...options, skip })).subscribe({
+          next: (doc) => subscriber.next(doc),
+          error: (err) => subscriber.error(err),
+          complete: () => temp === 3 && subscriber.complete(),
+        });
+        skip++;
+      }
+    });
   }
 
   findOne(filter: LogicalWhereExpr<Norm>, options?: RepositoryOptions): Promise<IDocument<NormSerializer>> {
@@ -71,7 +83,8 @@ export class NormRepository {
     return this.model.updateById(id, doc, options);
   }
 
-  updateBulk(filter: LogicalWhereExpr<Norm>, doc: Partial<NormDto>, options?: RepositoryOptions) {
-    return this.model.updateMany(filter, doc, options);
+  async updateBulk(filter: LogicalWhereExpr<Norm>, doc: Partial<NormDto>, options?: RepositoryOptions) {
+    const result = await this.model.updateMany(filter, doc, options);
+    return result.message.success;
   }
 }
